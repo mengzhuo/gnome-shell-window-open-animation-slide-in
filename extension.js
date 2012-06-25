@@ -1,19 +1,22 @@
 const Meta = imports.gi.Meta;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
-const Extension = imports.misc.extensionUtils;
-const ExtensionLists = Extension.extensions;
+const ExtensionSystem = imports.ui.extensionSystem;
+const ExtensionUtils = imports.misc.extensionUtils;
 
+
+const CONLICT_UUID = ["window-open-animation-scale-in@mengzhuo.org"];
 const WINDOW_ANIMATION_TIME = 0.20;
 
 const SlideInForWindow = new Lang.Class({
+    
     Name: "SlideInForWindow",
     
     _init: function (){
         
-        let display = global.screen.get_display();
+        this.display = global.screen.get_display();
         
-        display.connect('window-created', Lang.bind(this, this._slideIn));
+        this.signalConnectID = this.display.connect('window-created', Lang.bind(this, this._slideIn));
 
         global._slide_in_aminator = this;
         
@@ -43,23 +46,28 @@ const SlideInForWindow = new Lang.Class({
                              transition: 'easeOutQuad'
                             });
         };
+    },
+    destroy : function (){
+        delete global._slide_in_aminator;
+        this.display.disconnect(this.signalConnectID);
+    },
+    _onDestroy : function (){
+        this.destroy();
     }
 });
 
-let slidemaker = null;
-let metadata = null;
+slidemaker = null;
+metadata = null;
 
 function enable() {
     // check conflict extension
-    for  (var extension in ExtensionLists){
-        if (extension.state == 1){ // WORKAROUND:I can't found enum of extension state
-            for (var conflict in metadata.conflict-uuid){
-                if (extension.uuid == conflict){
-                    throw new Error('%s conflict with %s'.format(metadata.uuid,conflict));
-                    return false;
-                }
-            }
-        } 
+    for (var item in ExtensionUtils.extensions){
+        
+        if (CONLICT_UUID.indexOf(item.uuid) >= 0 && item.state == ExtensionSystem.ExtensionState.ENABLED){
+            throw new Error('%s conflict with %s'.format(item,metadata.uuid));
+            scalemaker = 'CONFLICTED';
+        }
+        
     }
     
     if (slidemaker == null){
@@ -74,5 +82,4 @@ function disable() {
 }
 function init(metadataSource) {
     metadata = metadataSource;
-
 }
