@@ -1,3 +1,4 @@
+const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
@@ -14,9 +15,9 @@ const SlideInForWindow = new Lang.Class({
     
     _init: function (){
         
-        this.display = global.screen.get_display();
+        this._display =  global.screen.get_display();
         
-        this.signalConnectID = this.display.connect('window-created', Lang.bind(this, this._slideIn));
+        this.signalConnectID = this._display.connect('window-created', Lang.bind(this, this._slideIn));
 
         global._slide_in_aminator = this;
         
@@ -43,13 +44,17 @@ const SlideInForWindow = new Lang.Class({
                              x:prevX,
                              opacity:255,
                              time: WINDOW_ANIMATION_TIME,
-                             transition: 'easeOutQuad'
+                             transition: 'easeOutQuad',
+                             onComplete:function(actor){
+                                actor.x = prevX;
+                             },
+                             onCompleteParams:[actor]
                             });
         };
     },
     destroy : function (){
         delete global._slide_in_aminator;
-        this.display.disconnect(this.signalConnectID);
+        this._display.disconnect(this.signalConnectID);
     },
     _onDestroy : function (){
         this.destroy();
