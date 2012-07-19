@@ -45,10 +45,10 @@ const SlideInForWindow = new Lang.Class({
                              opacity:255,
                              time: WINDOW_ANIMATION_TIME,
                              transition: 'easeOutQuad',
-                             onComplete:function(actor){
+                             onComplete:function(actor,prevX){
                                 actor.x = prevX;
                              },
-                             onCompleteParams:[actor]
+                             onCompleteParams:[actor,prevX]
                             });
         };
     },
