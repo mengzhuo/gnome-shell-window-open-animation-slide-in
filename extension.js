@@ -61,8 +61,7 @@ const SlideInForWindow = new Lang.Class({
     }
 });
 
-slidemaker = null;
-metadata = null;
+let slidemaker,metadata = null;
 
 function enable() {
     // check conflict extension
