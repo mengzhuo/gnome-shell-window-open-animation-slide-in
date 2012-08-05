@@ -29,9 +29,9 @@ const SlideInForWindow = new Lang.Class({
         if (!window.maximized_horizontally && window.get_window_type() == Meta.WindowType.NORMAL){
             let actor = window.get_compositor_private();
             
-            let [prevX,prevY] = actor.get_position();
+            [prevX,prevY] = actor.get_position();
             
-            let [width,height] = actor.get_size();
+            [width,height] = actor.get_size();
             
             let centerX = (prevX+Math.round(width/2));
             
@@ -45,12 +45,17 @@ const SlideInForWindow = new Lang.Class({
                              opacity:255,
                              time: WINDOW_ANIMATION_TIME,
                              transition: 'easeOutQuad',
-                             onComplete:function(actor,prevX){
-                                actor.x = prevX;
-                             },
-                             onCompleteParams:[actor,prevX]
+                             onComplete: this._animationDone,
+                             onCompleteParams:[actor,prevX],
+                             onCompleteScope : this,
+                             onOverwrite : this._animationDone,
+                             onOverwriteScope : this,
+                             onOverwriteParams: [actor,prevX]
                             });
         };
+    },
+    _animationDone : function(actor,prevX){
+        actor.x = prevX;
     },
     destroy : function (){
         delete global._slide_in_aminator;
@@ -61,7 +66,8 @@ const SlideInForWindow = new Lang.Class({
     }
 });
 
-let slidemaker,metadata = null;
+let slidemaker = null;
+let metadata = null;
 
 function enable() {
     // check conflict extension
