@@ -7,7 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 
 
 const CONLICT_UUID = ["window-open-animation-scale-in@mengzhuo.org"];
-const WINDOW_ANIMATION_TIME = 0.20;
+const WINDOW_ANIMATION_TIME = 0.3;
 
 const SlideInForWindow = new Lang.Class({
     
