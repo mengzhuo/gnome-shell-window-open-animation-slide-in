@@ -18,7 +18,7 @@ const SlideInForWindow = new Lang.Class({
         this._display =  global.screen.get_display();
         
         this.signalConnectID = this._display.connect('window-created', Lang.bind(this, this._slideIn));
-
+        this.afterSignalConnectID = this.display.connect_after('window-created', Lang.bind(this, this._animationDone));
         global._slide_in_aminator = this;
         
         this._half = global.screen_width/2;
@@ -26,10 +26,16 @@ const SlideInForWindow = new Lang.Class({
     },
     _slideIn : function (display,window){
         
-        if (!window.maximized_horizontally && window.get_window_type() == Meta.WindowType.NORMAL){
+        if (window.maximized_horizontally == false && window.get_window_type() == Meta.WindowType.NORMAL){
             let actor = window.get_compositor_private();
+            log("SAW:title %s".format(window.get_title()) )
+            log("SAW:max %s".format(window.maximized_horizontally) )
+            log("SAW:type %s".format(window.get_window_type() ))
+            window._slideAnimation = true;
             
             [prevX,prevY] = actor.get_position();
+            
+            actor.prevX = prevX
             
             [width,height] = actor.get_size();
             
@@ -54,12 +60,13 @@ const SlideInForWindow = new Lang.Class({
                             });
         };
     },
-    _animationDone : function(actor,prevX){
-        actor.x = prevX;
+    _animationDone : function(actor){
+        actor.x = actor.prevX;
     },
     destroy : function (){
         delete global._slide_in_aminator;
         this._display.disconnect(this.signalConnectID);
+        this._display.disconnect(this.afterSignalConnectID);
     },
     _onDestroy : function (){
         this.destroy();
